@@ -1,11 +1,11 @@
 import Head from "next/head";
-import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import FilterCountries from "../components/FilterCountries";
 import Navbar from "../components/Navbar";
 import SearchInput from "../components/SearchInput";
 
-const URL = "https://restcountries.com/v2/all";
+const URL = "https://restcountries.com/v3.1/all";
 
 export const getStaticProps = async () => {
   const res = await fetch(URL);
@@ -20,11 +20,11 @@ export default function Home({ countries }) {
   const [selectedRegion, setSelectedRegion] = useState("default");
   const handleChange = (e) => {
     setKeyword(e.target.value);
-  }
+  };
 
   const handleRegionChange = (e) => {
     setSelectedRegion(e.target.value);
-  }
+  };
 
   return (
     <div>
@@ -36,45 +36,52 @@ export default function Home({ countries }) {
       <Navbar />
       <main>
         <section className="content-wrapper">
-        <section className="search-wrapper">
-        <SearchInput onChange={handleChange} value={keyword} />
-        <FilterCountries onChange={handleRegionChange} value={selectedRegion} />
-        </section>
-        <div className="country-list">
-        {countries.filter((country) => {
-          if (keyword) {
-            return (country.name.toLowerCase().includes(keyword.toLowerCase()))
-          } else if (selectedRegion !== "default") {
-            return (country.region.toLowerCase().includes(selectedRegion.toLowerCase()))
-          }
-          return country;
-        }).map((country) => {
-          return (
-            <div className="country-item" key={country.id}>
-              <img src={country.flag} alt={`${country.name} flag`}/>
-              <div className="country-item_content">
-              <h3>{country.name}</h3>
-              <p><span>Population:</span> {country.population.toLocaleString('en-US')}</p>
-              <p><span>Region:</span> {country.region}</p>
-              <p><span>Capital:</span> {country.capital}</p>
-              </div>
-            </div>
-          );
-        })}
-        {/* {countries.map((country) => {
-          return (
-            <div className="country-item" key={country.id}>
-              <img src={country.flag} />
-              <div className="country-item_content">
-              <h3>{country.name}</h3>
-              <p><span>Population:</span> {country.population.toLocaleString('en-US')}</p>
-              <p><span>Region:</span> {country.region}</p>
-              <p><span>Capital:</span> {country.capital}</p>
-              </div>
-            </div>
-          );
-        })} */}
-        </div>
+          <section className="search-wrapper">
+            <SearchInput onChange={handleChange} value={keyword} />
+            <FilterCountries
+              onChange={handleRegionChange}
+              value={selectedRegion}
+            />
+          </section>
+          <div className="country-list">
+            {countries
+              .filter((country) => {
+                if (keyword) {
+                  return country.name.common
+                    .toLowerCase()
+                    .includes(keyword.toLowerCase());
+                } else if (selectedRegion !== "default") {
+                  return country.region
+                    .toLowerCase()
+                    .includes(selectedRegion.toLowerCase());
+                }
+                return country;
+              })
+              .map((country) => {
+                return (
+                  <div className="country-item" key={country.name.common}>
+                    <img src={country.flags.svg} alt={`${country.name.common} flag`} />
+                    <div className="country-item_content">
+                      <Link href={"/" + country.name.common.toLowerCase()}>
+                        <a>
+                          <h3>{country.name.common}</h3>
+                        </a>
+                      </Link>
+                      <p>
+                        <span>Population:</span>{" "}
+                        {country.population.toLocaleString("en-US")}
+                      </p>
+                      <p>
+                        <span>Region:</span> {country.region}
+                      </p>
+                      <p>
+                        <span>Capital:</span> {country.capital}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
         </section>
       </main>
     </div>
